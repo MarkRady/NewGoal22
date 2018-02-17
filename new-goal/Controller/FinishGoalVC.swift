@@ -7,6 +7,9 @@
 //
 
 import UIKit
+import CoreData
+
+let appDelegate = UIApplication.shared.delegate as? AppDelegate;
 
 class FinishGoalVC: UIViewController {
 
@@ -17,7 +20,11 @@ class FinishGoalVC: UIViewController {
     // init data
     
     var goalDescription: String!
-    var goalType: String!
+    var goalType: GoalType!
+    
+
+//    var goalDataArray: [String: Any] = ["":""];
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -25,17 +32,58 @@ class FinishGoalVC: UIViewController {
         createGoalBtn.bindToKeyboard();
     }
     
+  
     func initData(description:String, goalType: GoalType){
-        
+        self.goalDescription = description;
+        self.goalType = goalType;
+//        goalDataArray = [
+//            "description": description,
+//            "goalType": goalType,
+//        ];
+//        print("goalType", goalDataArray);
     }
 
     
     @IBAction func createBtnPressed(_ sender: Any) {
+        if targetInput.text != "" {
+            self.save { (complete) in
+                if complete {
+                    dismiss(animated: true, completion: nil)
+                }
+                
+            }
+        }
+        
     }
     
     
     @IBAction func dismissBtnPressed(_ sender: Any) {
+        dismissDetail()
     }
     
     
+    func save(completion: (_ finish: Bool) -> ()){
+        guard let manageContext = appDelegate?.persistentContainer.viewContext else { return  }
+        let goals = Goals(context: manageContext);
+        
+        goals.goalDescription = goalDescription;
+        goals.goalType = goalType.rawValue;
+        goals.goalTarget = Int32(targetInput.text!)!;
+        goals.goalProgress = Int32(0);
+        
+        do {
+            try manageContext.save();
+            completion(true);
+            print("msg", "successfully  ")
+        }
+        catch {
+            debugPrint("Could note save: \(error.localizedDescription)")
+            completion(false);
+        }
+    }
+    
 }
+
+
+
+

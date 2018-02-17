@@ -11,7 +11,8 @@ import CoreData;
 
 class GoalsVC: UIViewController {
 
-    
+    var dataColection: [Goals] = [];
+
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -23,6 +24,23 @@ class GoalsVC: UIViewController {
         tableView.isHidden = false;
         
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated);
+        self.fetch { (complete) in
+            if  complete {
+                if dataColection.count > 0 {
+                    tableView.isHidden = false;
+                    
+                } else {
+                    tableView.isHidden = true;
+                }
+            }
+            
+        }
+        tableView.reloadData(); 
+    }
+    
 
     
     @IBAction func createBtnPressed(_ sender: Any) {
@@ -42,7 +60,7 @@ extension GoalsVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 4;
+        return dataColection.count;
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -52,9 +70,32 @@ extension GoalsVC: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell();
                 
         }
-        
-        cell.configureCell(description: "Eat salad", type: .longTerm, progress: 2);
+        let goal = dataColection[indexPath.row]
+        cell.configureCell(goal: goal);
+//        cell.configureCell(description: goal.goalDescription!, type: goal.goalType, progress: goal.goalProgress);
         return cell;
     }
     
 }
+
+
+extension GoalsVC {
+    func fetch (completion: (_ complete: Bool) -> ()) {
+        guard let manageContext = appDelegate?.persistentContainer.viewContext else {return};
+        
+        let fetchRequest = NSFetchRequest<Goals>(entityName: "Goals");
+        
+        do {
+            dataColection = try manageContext.fetch(fetchRequest);
+            print("Data detch successfully")
+            completion(true);
+        } catch {
+            debugPrint("can fetch the data \(error.localizedDescription)");
+            completion(false);
+        }
+        
+    }
+}
+
+
+

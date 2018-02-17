@@ -24,6 +24,25 @@ extension UIViewController {
         
     }
     
+    func presentSecondaryDetail(_ viewControllerToPresent: UIViewController) {
+        let transation = CATransition();
+        transation.duration = 0.3;
+        
+        transation.type = kCATransitionPush;
+        
+        transation.subtype = kCATransitionFromRight;
+        
+        guard let presentedViewController = presentedViewController else { return }
+        
+        presentedViewController.dismiss(animated: false) {
+            self.view.window?.layer.add(transation, forKey: kCATransition);
+            self.present(viewControllerToPresent, animated: false, completion: nil);
+        }
+        
+    }
+    
+    
+    
     func dismissDetail() {
         let transation = CATransition();
         transation.duration = 0.3;
