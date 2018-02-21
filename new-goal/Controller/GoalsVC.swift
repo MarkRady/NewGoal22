@@ -75,7 +75,6 @@ extension GoalsVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        print("lol editing \(indexPath)");
         
         let deleteAction =  UITableViewRowAction(style: .destructive, title: "DELETE") { (rowAction, indexPath) in
             self.removeGoal(atIndexPath: indexPath);
@@ -83,14 +82,43 @@ extension GoalsVC: UITableViewDelegate, UITableViewDataSource {
             tableView.deleteRows(at: [indexPath], with: .automatic)
         }
         deleteAction.backgroundColor = #colorLiteral(red: 1, green: 0.1491314173, blue: 0, alpha: 1);
+
+        let progressAction =  UITableViewRowAction(style: .normal, title: "+") { (rowAction, indexPath) in
+            self.increaseProgress(atIndexPath: indexPath);
+            tableView.reloadRows(at: [indexPath], with: .automatic);
+
+        }
+        progressAction.backgroundColor = #colorLiteral(red: 1, green: 0.5763723254, blue: 0, alpha: 1);
+
         
-        return [deleteAction];
+        
+        return [deleteAction,progressAction];
 
     }
 }
 
 
 extension GoalsVC {
+    
+    func increaseProgress(atIndexPath indexPath: IndexPath) {
+        guard let manageContext = appDelegate?.persistentContainer.viewContext else {return};
+        
+        let selectGoal = dataColection[indexPath.row];
+        
+        if selectGoal.goalProgress < selectGoal.goalTarget {
+            selectGoal.goalProgress = selectGoal.goalProgress + 1;
+        }else {
+            return;
+        }
+        
+        do {
+            try manageContext.save();
+            print("progress updated");
+        } catch {
+            debugPrint("Could not update goal progress \(error.localizedDescription)");
+        }
+    }
+    
     func removeGoal(atIndexPath indexPath: IndexPath) {
         guard let manageContext = appDelegate?.persistentContainer.viewContext else {return};
         
