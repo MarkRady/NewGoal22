@@ -9,9 +9,23 @@
 import UIKit;
 import CoreData;
 
-class GoalsVC: UIViewController {
+protocol ProcessStatusDelegate:NSObjectProtocol{
+    func updateProcessStatus(isCompleted : Bool)
+}
+
+class GoalsVC: UIViewController, ProcessStatusDelegate {
+    
+    
+    func updateProcessStatus(isCompleted: Bool) {
+        print("updateProcessStatus ")
+        coreDataFetcher();
+        tableView.reloadData();
+    
+    }
+    
 
     var dataColection: [Goals] = [];
+    var delegate:ProcessStatusDelegate?
 
     
     @IBOutlet weak var tableView: UITableView!
@@ -22,20 +36,36 @@ class GoalsVC: UIViewController {
         tableView.delegate = self;
         tableView.dataSource = self;
         tableView.isHidden = false;
+//        view.insetsLayoutMarginsFromSafeArea = true
+
         
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated);
+        print("viewWillAppear")
         coreDataFetcher();
         tableView.reloadData(); 
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        print("viewWillDisappear");
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        print("viewDidDisappear")
+    }
+    
+    
 
     
     @IBAction func createBtnPressed(_ sender: Any) {
-        guard let createGoalVC = storyboard?.instantiateViewController(withIdentifier: "CreateGoalVC") else { return };
-        
+        guard let createGoalVC = storyboard?.instantiateViewController(withIdentifier: "CreateGoalVC") as? CreateGoalVC else { return };
+        createGoalVC.delegate = self
+        self.navigationController?.pushViewController(createGoalVC, animated: true)
+
         presentDetail(createGoalVC);
 //        performSegue(withIdentifier: "createGoal", sender: nil)
     }

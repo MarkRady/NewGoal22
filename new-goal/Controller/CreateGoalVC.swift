@@ -15,7 +15,10 @@ class CreateGoalVC: UIViewController, UITextViewDelegate {
     @IBOutlet weak var shortTermBtn: UIButton!
     @IBOutlet weak var longTermBtn: UIButton!
     @IBOutlet weak var nextBtn: UIButton!
-    
+
+
+    var delegate: GoalsVC?
+
     // selected option
     var goalType: GoalType = .shortTerm;
     
@@ -48,7 +51,8 @@ class CreateGoalVC: UIViewController, UITextViewDelegate {
         if goalTextView.text != "" && goalTextView.text != "What is your goal ?" {
             
             guard let finishGoalVC = storyboard?.instantiateViewController(withIdentifier: "FinishGoalVC") as? FinishGoalVC else {return}
-            
+            finishGoalVC.delegate = self.delegate
+
             finishGoalVC.initData(description:self.goalTextView.text,
                                   goalType: self.goalType);
             presentingViewController?.presentSecondaryDetail(finishGoalVC); 
@@ -63,6 +67,7 @@ class CreateGoalVC: UIViewController, UITextViewDelegate {
     
     
     @IBAction func dismisBtnPressed(_ sender: Any) {
+        print("dismisBtnPressed");
         dismissDetail();
     }
     

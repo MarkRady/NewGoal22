@@ -21,7 +21,7 @@ class FinishGoalVC: UIViewController {
     
     var goalDescription: String!
     var goalType: GoalType!
-    
+    var delegate: GoalsVC?
 
 //    var goalDataArray: [String: Any] = ["":""];
     
@@ -36,11 +36,7 @@ class FinishGoalVC: UIViewController {
     func initData(description:String, goalType: GoalType){
         self.goalDescription = description;
         self.goalType = goalType;
-//        goalDataArray = [
-//            "description": description,
-//            "goalType": goalType,
-//        ];
-//        print("goalType", goalDataArray);
+
     }
 
     
@@ -48,6 +44,8 @@ class FinishGoalVC: UIViewController {
         if targetInput.text != "" {
             self.save { (complete) in
                 if complete {
+                    print("dismiss")
+                    self.delegate?.updateProcessStatus(isCompleted: true)
                     dismiss(animated: true, completion: nil)
                 }
                 
